@@ -2,10 +2,13 @@
 
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 3000;
 const jsonParser = require('body-parser').json;
+const logger = require('morgan');
+
+const port = process.env.PORT || 3000;
 const routes = require('./routes/');
 
+app.use(logger('dev'));
 app.use(jsonParser());
 
 app.use('/questions', routes);
