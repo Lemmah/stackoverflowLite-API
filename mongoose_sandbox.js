@@ -87,22 +87,20 @@ db.once('open', () => {
     whale
   ];
 
-  // TODO: Pyramid of doom here, opportunity to use a Promise.
-  Animal.deleteMany({}, err => {
-    if (err) console.error(err);
-    Animal.create(animalData, err => {
-      if (err) console.error(err);
-      Animal.findOne({type: 'elephant'}, (err, elephant) => {
-        if (err) console.error(err);
-        elephant.findSameColor((err, animals) => {
-          if (err) console.log(err);
-          animals.forEach(animal => {
-            console.log(`${animal.name} the ${animal.color} ${animal.type} is a ${animal.size}-sized animal.`);
-          });
-          db.close(() => console.log('db connection closed'));
-        });
-      });
-    });
+  const emptyAnimalsCollection = new Promise((resolve) =>  {
+    resolve(Animal.deleteMany({}));
   });
+
+  emptyAnimalsCollection
+    .then(() => Animal.create(animalData))
+    .then(() => Animal.findOne({type: 'elephant'}))
+    .then(elephant => elephant.findSameColor())
+    .then(animals => {
+      animals.forEach(animal => {
+        console.log(`${animal.name} the ${animal.color} ${animal.type} is a ${animal.size}-sized animal.`);
+      });
+    })
+    .catch(err => console.error(err))
+    .then(() => db.close(() => console.log('db connection closed')));
 
 });
