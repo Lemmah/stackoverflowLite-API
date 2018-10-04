@@ -13,7 +13,7 @@ app.use(jsonParser());
 
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost:27017/sandbox', { useNewUrlParser: true });
+mongoose.connect('mongodb://localhost:27017/stackoverflowLite', { useNewUrlParser: true });
 
 const db = mongoose.connection;
 
@@ -23,6 +23,16 @@ db.on('error', (err) => {
 
 db.once('open', () => {
   console.log('db connection successful');
+});
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'PUT,POST,DELETE');
+    return res.status(200).json({});
+  }
+  next();
 });
 
 app.use('/questions', routes);
