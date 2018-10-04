@@ -35,6 +35,19 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  const postingData = (req.method === 'POST');
+  if (postingData) {
+    const data = req.body.text.trim();
+    if (!data || data.length < 2) {
+      const err = new Error('post data is too short or empty');
+      err.status = 400;
+      return next(err);
+    }
+  }
+  next();
+});
+
 app.use('/questions', routes);
 
 // catch 404 and forrward to error handler
@@ -47,6 +60,7 @@ app.use((req, res, next) => {
 // Error Handler
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
+  console.error(err);
   res.json({
     error: {
       message: err.message
